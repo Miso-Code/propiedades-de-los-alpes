@@ -1,0 +1,31 @@
+tasks:
+  - name: Gradle Build
+    init: ./context-mapper/gradlew build
+  - name: Install Python
+    init: >
+      pyenv install 3.10.7 -f &&
+      pyenv local 3.10.7 &&
+      gp sync-done bundle
+  - name: Install dependencies
+    init: gp sync-await bundle
+    command: pip install -r requirements.txt
+image:
+  file: .gitpod.Dockerfile
+vscode:
+  extensions:
+    - jebbs.plantuml
+    - contextmapper.context-mapper-vscode-extension
+    - vscjava.vscode-java-pack
+    - asciidoctor.asciidoctor-vscode
+
+ports:
+  - port: 2181
+    onOpen: ignore
+  - port: 8080
+    onOpen: ignore
+  - port: 6650
+    onOpen: ignore
+  - port: 2181
+    onOpen: ignore
+  - port: 6650
+    onOpen: ignore

@@ -1,0 +1,87 @@
+{
+	"info": {
+		"_postman_id": "566d518d-9874-43fa-bc36-06118548d3c7",
+		"name": "Entrega 3",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "4215707"
+	},
+	"item": [
+		{
+			"name": "Crear  Comando Ingestión",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"agent_id\": \"random-id\",\r\n    \"location\": {\r\n        \"city\": {\r\n            \"name\": \"Fake City\",\r\n            \"code\": \"FC\",\r\n            \"country\": {\r\n                \"name\": \"Colombia\",\r\n                \"code\": \"CO\"\r\n            }\r\n        },\r\n        \"address\": \"123 Fake St\",\r\n        \"building\": \"Fake Building\",\r\n        \"floor\": \"3rd\",\r\n        \"inner_code\": \"A301\",\r\n        \"coordinates\": {\r\n            \"latitude\": 40.7128,\r\n            \"longitude\": -74.0060\r\n        },\r\n        \"additional_info\": \"Near Fake Park, Close to Fake School\"\r\n    },\r\n    \"property_type\": \"House\",\r\n    \"property_subtype\": \"Detached\",\r\n    \"rooms\": 4,\r\n    \"bathrooms\": 2,\r\n    \"parking_spaces\": 2,\r\n    \"construction_area\": 200.5,\r\n    \"land_area\": 500.75,\r\n    \"price\": 350000.00,\r\n    \"currency\": \"USD\",\r\n    \"price_per_m2\": 1746.27,\r\n    \"price_per_ft2\": 162.10,\r\n    \"property_url\": \"https://fakeproperty.com/123\",\r\n    \"property_images\": \"https://fakeproperty.com/123/image1.jpg,https://fakeproperty.com/123/image2.jpg,https://fakeproperty.com/123/image3.jpg\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:5000/ingestion/async",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"ingestion",
+						"async"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Crear Agente automatizado",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"creator_name\":{\r\n        \"first_name\": \"Miso\",\r\n        \"last_name\": \"Team\"\r\n    },\r\n    \"automation\":{\r\n        \"source\": \"URL\",\r\n        \"protocol\": \"HTTP\",\r\n        \"port\": \"80\",\r\n        \"auth\":{\r\n            \"username\":\"foo\",\r\n            \"password\":\"bar\"\r\n        },\r\n        \"frequency\":{\r\n            \"unit\": \"seconds\",\r\n            \"value\": 10\r\n        }\r\n    }\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:5000/agents/automation",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"agents",
+						"automation"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Obtener Ingestiones",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5000/ingestion",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"ingestion"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

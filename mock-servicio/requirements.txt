@@ -1,0 +1,9 @@
+flask
+PyDispatcher
+pulsar-client
+pulsar-client[avro]
+flask_sqlalchemy
+flask_swagger
+psycopg2-binary
+dill
+faker

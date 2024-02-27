@@ -1,0 +1,169 @@
+/* Context Map para el sistema de gestión de propiedades de Los Alpes */
+ContextMap PropiedadesDeLosAlpesMap {
+    type = SYSTEM_LANDSCAPE
+    state = AS_IS
+    /* Contextos acotados */
+    contains RecopilacionDeDatosContext
+    contains ControlDeDatosContext
+    contains GestionYSoporteDeSistemasDeDatosContext
+    contains ReporteDeResultadosContext
+    contains IntegracionEmpresarialContext
+
+    RecopilacionDeDatosContext [D,C]<-[U,S] ControlDeDatosContext
+    IntegracionEmpresarialContext [U, OHS] -> [D, CF] GestionYSoporteDeSistemasDeDatosContext
+
+
+}
+
+/* Definiciones de Contextos Acotados */
+BoundedContext RecopilacionDeDatosContext implements RecopilacionDeListados, TransaccionesInmobiliarias, GestionDatosGIS, GestionDatosGubernamentales, InformacionDeInquilinos, InvestigacionDePropiedades  {
+    type = FEATURE
+    domainVisionStatement = ""
+    responsibilities = ""
+
+    Aggregate Propiedades {
+        Entity Propiedad {
+            aggregateRoot
+
+            - Identificador id
+            Float tamano
+            - TipoDeConstruccion tipoDeConstruccion
+            String ubicacion
+            - List<Fotografia> fotografias
+        }
+
+        Entity Transaccion {
+            - TipoTransaccion tipo
+            Date fecha
+            BigDecimal precio
+            - List<ParteInvolucrada> partesInvolucradas
+        }
+
+        Entity Inquilino {
+            String nombre
+            - Contacto informacionDeContacto
+            - List<HistorialArrendamiento> historialDeArrendamiento
+        }
+
+        ValueObject Identificador {
+            String id key
+        }
+
+        ValueObject TipoDeConstruccion {
+            String nombre
+            String descripcion
+        }
+
+        ValueObject Fotografia {
+            String urlFoto
+        }
+
+        ValueObject TipoTransaccion {
+            String nombre
+            String descripcion
+        }
+
+        ValueObject ParteInvolucrada {
+            String nombre
+            String rol // Ejemplos: "vendedor", "comprador", "arrendatario"
+        }
+
+        ValueObject Contacto {
+            String emailContacto
+            String telefono
+        }
+
+        ValueObject HistorialArrendamiento {
+            Date fechaInicio
+            Date fechaFin
+            BigDecimal valorArrendamiento
+        }
+    }
+}
+
+BoundedContext ControlDeDatosContext implements ControlDeCalidadDeDatos, NormatividadDeDatos {
+}
+
+BoundedContext GestionYSoporteDeSistemasDeDatosContext implements MantenimientoDeSistemasDeInformacion, AlmacenamientoDeDatos{
+}
+
+BoundedContext ReporteDeResultadosContext implements ComparativosDeVentas, InformesDeMercado, AnaliticaDeDatos{
+}
+
+BoundedContext IntegracionEmpresarialContext implements IntegracionesB2B {
+}
+
+/* Definiciones de Dominios y Subdominios */
+Domain InformacionYAnalisisDelMercadoInmobiliario {
+    domainVisionStatement =  "Ofrecer análisis de mercado inmobiliario profundos y perspicaces que permitan a nuestros clientes tomar decisiones estratégicas basadas en datos y tendencias del mercado"
+
+    Subdomain InvestigacionDePropiedades {
+        type = CORE_DOMAIN
+        domainVisionStatement = " Evaluación detallada de propiedades inmobiliarias comerciales, incluyendo características físicas y fotografías"
+    }
+
+    Subdomain TransaccionesInmobiliarias {
+        type = CORE_DOMAIN
+        domainVisionStatement = "Registro y seguimiento de transacciones de arrendamiento y venta de propiedades comerciales"
+    }
+
+    Subdomain ComparativosDeVentas {
+        type = CORE_DOMAIN
+        domainVisionStatement = "Análisis de transacciones históricas para proporcionar comparativos de ventas en el mercado inmobiliario"
+    }
+
+    Subdomain InformacionDeInquilinos {
+        type = CORE_DOMAIN
+        domainVisionStatement = "Recopilación y verificación de datos de inquilinos y arrendatarios en propiedades comerciales"
+    }
+
+    Subdomain AlmacenamientoDeDatos {
+        type = SUPPORTING_DOMAIN
+        domainVisionStatement = "Mantenimiento y gestión de bases de datos y sistemas de almacenamiento de datos, asegurando que la información recopilada sea accesible y esté segura para su posterior análisis"
+    }
+
+    Subdomain MantenimientoDeSistemasDeInformacion {
+        type = SUPPORTING_DOMAIN
+        domainVisionStatement = "Soporte técnico y mantenimiento rutinario de los sistemas de información utilizados en la recopilación y análisis de datos, incluyendo la actualización de software y hardware"
+    }
+
+    Subdomain InformesDeMercado {
+        type = SUPPORTING_DOMAIN
+        domainVisionStatement = "Elaboración de informes detallados sobre el estado actual y las tendencias del mercado inmobiliario"
+    }
+
+    Subdomain RecopilacionDeListados {
+        type = GENERIC_SUBDOMAIN
+        domainVisionStatement = "Búsqueda y recolección de datos sobre Mantenimiento de listados actualizados de propiedades para alquiler, venta y subarrendamiento"
+    }
+
+    Subdomain GestionDatosGIS {
+        type = GENERIC_SUBDOMAIN
+        domainVisionStatement = " Implementación y mantenimiento de procesos estandarizados para la entrada y captura de datos de sistemas GIS, incluyendo la utilización de herramientas y software comunes para la recopilación de datos"
+    }
+
+    Subdomain GestionDatosGubernamentales {
+        type = GENERIC_SUBDOMAIN
+        domainVisionStatement = "Implementación y mantenimiento de procesos estandarizados para la entrada y captura de datos gubernamentales"
+    }
+
+    Subdomain ControlDeCalidadDeDatos {
+        type = GENERIC_SUBDOMAIN
+        domainVisionStatement = "Revisión y aseguramiento de la precisión, seguridad, privacidad e integridad de los datos recopilados antes de su análisis y uso en la toma de decisiones"
+    }
+
+    Subdomain NormatividadDeDatos {
+        type = GENERIC_SUBDOMAIN
+        domainVisionStatement = "Revisión y aseguramiento del cumplimiento de normativas y leyes vigentes en cada país, aplicables al tratamiento y almacenamiento de los datos recopilados"
+    }
+
+    Subdomain IntegracionesB2B {
+        type = GENERIC_SUBDOMAIN
+        domainVisionStatement = "Desarrollo de sistemas empresariales para facilitar el intercambio de datos"
+    }
+
+    Subdomain AnaliticaDeDatos {
+        type = GENERIC_SUBDOMAIN
+        domainVisionStatement = "Utilización de herramientas y técnicas avanzadas para el procesamiento y análisis de los datos inmobiliarios recopilados"
+    }
+}
