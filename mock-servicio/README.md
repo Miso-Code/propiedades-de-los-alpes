@@ -60,17 +60,17 @@ curl --location 'http://localhost:5000/ingestion/async' \
       "location": "Your property location",
       "property_type": "Your property type",
       "property_subtype": "Your property subtype",
-      "rooms": 0, 
-      "bathrooms": 0, 
-      "parking_spaces": 0, 
-      "construction_area": 0, 
-      "land_area": 0, 
-      "price": 0, 
+      "rooms": 0,
+      "bathrooms": 0,
+      "parking_spaces": 0,
+      "construction_area": 0,
+      "land_area": 0,
+      "price": 0,
       "currency": "Currency type (e.g., USD, EUR)",
-      "price_per_m2": 0, 
-      "price_per_ft2": 0, 
+      "price_per_m2": 0,
+      "price_per_ft2": 0,
       "property_url": "URL to the property listing",
-      "property_images": "URL to image 1" 
+      "property_images": "URL to image 1"
     }
     '
 ```
@@ -95,7 +95,7 @@ curl --location 'http://localhost:5000/agent/automation' \
     --header 'Content-Type: application/json' \
     --header 'Cookie: session=eyJ1b3ciOnsiIGIiOiJnQVNWVHdBQUFBQUFBQUNNSG5OeVl5NWtZWFJoWDJOdmJHeGxZM1JwYjI0dVkyOXVabWxuTG5WdmQ1U01GRk5SVEVGc1kyaGxiWGxWYm1sMFQyWlhiM0pybEpPVUtZR1VmWlNNQ0Y5aVlYUmphR1Z6bEYyVWMySXUifX0.Zd0c2g.O2L7mFmpMy-4reYjMe3GtQbZcx8' \
     --data '{
-        "creator_name":{
+        "creator_name": {
             "first_name": "Miso",
             "last_name": "Team"
         },
@@ -114,3 +114,23 @@ curl --location 'http://localhost:5000/agent/automation' \
         }
     }'
 ```
+
+## Autores
+
+- [Erik Fernando Loaiza Patiño](https://github.com/erikloaiza)
+- [Brayan Henao](https://github.com/brayanhenao)
+- [Felipe Cerquera](https://github.com/pipeCer)
+- [Rodrigo Escobar Lopez](https://github.com/ocralo)
+
+### Trabajo Realizado para entrega 4
+
+- Configuración de pulsar y zookeeper en docker-compose
+- Configuración de postgres en docker-compose
+- Configuración de watcher en docker-compose
+- Configuración de data collection en docker-compose
+- Configuración de NGINX en docker-compose
+- Creación de agentes autorizados
+- Creación de ingestion de propiedades
+- Configuración de validación de datos
+- Subscripción a eventos de integración
+- Pruebas de los servicios
