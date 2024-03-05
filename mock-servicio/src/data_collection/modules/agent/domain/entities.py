@@ -6,6 +6,7 @@ from .value_objects import Name, Authentication, Automation, Email
 
 @dataclass
 class Agent(Entity):
+    started_executions: int = 0
     ...
 
 

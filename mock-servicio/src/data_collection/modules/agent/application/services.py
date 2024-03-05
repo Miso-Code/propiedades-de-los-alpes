@@ -24,6 +24,10 @@ class AgentService(Service):
     def agent_factory(self):
         return self._agent_factory
 
+    def get_automation_agent_by_id(self, agent_id: uuid.UUID) -> AutomationAgent:
+        repository = self.repository_factory.create_object(AgentRepository.__class__)
+        agent: AutomationAgent = repository.get_by_id(agent_id)
+        return agent
     def create_automation_agent(self, agent_dto: AutomationAgentDTO) -> AutomationAgent:
         agent: AutomationAgent = self.agent_factory.create_object(agent_dto,
                                                                   AutomationAgentMapper())
@@ -40,13 +44,11 @@ class AgentService(Service):
         agents: list[AutomationAgent] = repository.get_all()
         return agents
 
-    def update_automation_agent(self, agent_id: uuid.UUID, agent_dto: AutomationAgentDTO):
+    def update_automation_agent(self, agent_dto: AutomationAgentDTO):
         agent: AutomationAgent = self.agent_factory.create_object(agent_dto,
                                                                   AutomationAgentMapper())
-        agent.id = agent_id
         repository = self.repository_factory.create_object(AgentRepository.__class__)
         UnitOfWorkPort.register_batch(repository.update, agent)
         UnitOfWorkPort.savepoint()
         UnitOfWorkPort.commit()
         return agent
-

@@ -1,3 +1,5 @@
+from uuid import UUID
+
 from .dto import PropertyIngestionDTO
 from .mappers import PropertyIngestionMapper
 from ..domain.entities import PropertyIngestion
@@ -37,4 +39,9 @@ class PropertyIngestionService(Service):
         repository = self.repository_factory.create_object(PropertyIngestionRepository.__class__)
         ingestions: list[PropertyIngestion] = repository.get_all()
         return ingestions
+
+    def get_ingestion_by_id(self, ingestion_id: str) -> PropertyIngestion:
+        repository = self.repository_factory.create_object(PropertyIngestionRepository.__class__)
+        ingestion: PropertyIngestion = repository.get_by_id(UUID(ingestion_id))
+        return ingestion
 

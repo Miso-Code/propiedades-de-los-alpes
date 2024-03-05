@@ -5,7 +5,17 @@ from ......seedwork.infrastructure.schema.v1.commands import IntegrationCommand
 
 class CreatePropertyIngestionPayload(IntegrationCommand):
     agent_id = String()
-    location = String()
+    location_city_name = String()
+    location_city_code = String()
+    location_country_name = String()
+    location_country_code = String()
+    location_address = String()
+    location_building = String()
+    location_floor = String()
+    location_inner_code = String()
+    location_coordinates_latitude = Float()
+    location_coordinates_longitude = Float()
+    location_additional_info = String()
     property_type = String()
     property_subtype = String()
     rooms = Integer()

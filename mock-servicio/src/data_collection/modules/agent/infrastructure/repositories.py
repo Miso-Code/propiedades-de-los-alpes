@@ -1,3 +1,4 @@
+from datetime import datetime
 from uuid import UUID
 
 from .dto import AgentDTO
@@ -18,8 +19,10 @@ class SQLAlchemyAutomationAgentRepository(AgentRepository):
         return self._property_ingestion_factory
 
     def get_by_id(self, id: UUID) -> AutomationAgent:
-        # TODO
-        raise NotImplementedError
+        agent_db = db.session.query(AgentDTO).filter_by(id=str(id)).first()
+        mapper = AutomationAgentMapper()
+        agent: AutomationAgent = AutomationAgentFactory().create_object(agent_db, mapper)
+        return agent
 
     def get_all(self) -> list[AutomationAgent]:
         all_agents_db = db.session.query(AgentDTO).all()
@@ -47,7 +50,8 @@ class SQLAlchemyAutomationAgentRepository(AgentRepository):
             "automation_password": update_entity.automation_password,
             "automation_frequency_unit": update_entity.automation_frequency_unit,
             "automation_frequency_value": update_entity.automation_frequency_value,
-            "automation_last_run": update_entity.automation_last_run
+            "automation_last_run": datetime.strptime(update_entity.automation_last_run, "%Y-%m-%dT%H:%M:%S.%f"),
+            "started_executions": update_entity.started_executions
         })
 
     def delete(self, entity_id: UUID):

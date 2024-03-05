@@ -1,0 +1,127 @@
+{
+	"info": {
+		"_postman_id": "afe95a5d-cd2d-46d8-a41c-47a610a63bfd",
+		"name": "Propiedades de los Alpes (REST)",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "7915741"
+	},
+	"item": [
+		{
+			"name": "Get All Ingestions",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5000/ingestion",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"ingestion"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Ingestion",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"agent_id\": \"4b108585-0c0c-4c40-b0f8-93f98b2e89b3\",\n  \"location\": {\n    \"city\":{\n        \"name\": \"New York\",\n        \"code\": \"NY\",\n        \"country\": {\n            \"name\":\"United States Of America\",\n            \"code\": \"US\"\n        }\n    },\n    \"address\":\"Fake st 123\",\n    \"building\": \"Empire State\",\n    \"floor\": 4000,\n    \"inner_code\": \"To the left\",\n    \"coordinates\":{\n        \"latitude\":\"44551232\",\n        \"longitude\": \"213123123\"\n    },\n    \"additional_info\":\"\"\n  },\n  \"property_type\": \"Your property type\",\n  \"property_subtype\": \"Your property subtype\",\n  \"rooms\": 10, // Number of rooms\n  \"bathrooms\": 0, // Number of bathrooms\n  \"parking_spaces\": 0, // Number of parking spaces\n  \"construction_area\": 0, // Construction area in square meters or your unit of choice\n  \"land_area\": 0, // Land area in square meters or your unit of choice\n  \"price\": 0, // Price of the property\n  \"currency\": \"Currency type (e.g., USD, EUR)\",\n  \"price_per_m2\": 0, // Price per square meter\n  \"price_per_ft2\": 0, // Price per square foot\n  \"property_url\": \"URL to the property listing\",\n  \"property_images\": \"URL to image 1\" // List of URLs to property images\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:5000/ingestion/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"ingestion",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Automation Agent",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"creator_name\":{\n        \"first_name\": \"Miso\",\n        \"last_name\": \"Team\"\n    },\n    \"automation\":{\n        \"source\": \"URL\",\n        \"protocol\": \"HTTP\",\n        \"port\": \"80\",\n        \"auth\":{\n            \"username\":\"foo\",\n            \"password\":\"bar\"\n        },\n        \"frequency\":{\n            \"unit\": \"seconds\",\n            \"value\": 60\n        }\n    }\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:5000/agent/automation",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"agent",
+						"automation"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Agent By Id",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5000/agent/automation",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"agent",
+						"automation"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Properties",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5001/properties_and_transactions/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5001",
+					"path": [
+						"properties_and_transactions",
+						""
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

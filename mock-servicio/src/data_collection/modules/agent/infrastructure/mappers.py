@@ -23,6 +23,7 @@ class AutomationAgentMapper(Mapper):
         automation_agent_dto.automation_frequency_unit = entity.automation.frequency.unit
         automation_agent_dto.automation_frequency_value = entity.automation.frequency.value
         automation_agent_dto.automation_last_run = entity.automation.last_execution
+        automation_agent_dto.started_executions = entity.started_executions
         return automation_agent_dto
 
     def dto_to_entity(self, dto: AgentDTO) -> AutomationAgent:
@@ -46,5 +47,6 @@ class AutomationAgentMapper(Mapper):
                 )
                 , last_execution=dto.automation_last_run
             )
+            , started_executions=dto.started_executions
         )
         return automation_agent

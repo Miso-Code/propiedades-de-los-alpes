@@ -18,14 +18,18 @@ class SQLAlchemyPropertyIngestionRepository(PropertyIngestionRepository):
         return self._property_ingestion_factory
 
     def get_by_id(self, id: UUID) -> PropertyIngestion:
-        # TODO
-        raise NotImplementedError
+        ingestion_db = db.session.query(PropertyIngestionDTO).filter_by(id=str(id)).first()
+        property_ingestion_mapper = PropertyIngestionMapper()
+        ingestion: PropertyIngestion = PropertyIngestionFactory().create_object(ingestion_db, property_ingestion_mapper)
+        return ingestion
 
     def get_all(self) -> list[PropertyIngestion]:
         all_ingestions_db = db.session.query(PropertyIngestionDTO).all()
-        mapper = PropertyIngestionMapper()
+        property_ingestion_mapper = PropertyIngestionMapper()
+
         all_ingestions: list[PropertyIngestion] = [
-            PropertyIngestionFactory().create_object(ingestion, mapper) for ingestion in all_ingestions_db
+            PropertyIngestionFactory().create_object(ingestion, property_ingestion_mapper) for ingestion in
+            all_ingestions_db
         ]
 
         return all_ingestions

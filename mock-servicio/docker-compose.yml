@@ -1,14 +1,21 @@
-version: '3'
+version: "3"
 networks:
   pulsar:
     driver: bridge
-  db:
+  data_collection:
     driver: bridge
+  data_control:
+    driver: bridge
+  properties_and_transactions:
+    driver: bridge
+  bff:
+    driver: bridge
+name: propiedades_de_los_alpes
 services:
   # Start zookeeper
   zookeeper:
     image: apachepulsar/pulsar:latest
-    profiles: [ "pulsar" ]
+    profiles: ["pulsar"]
     container_name: zookeeper
     restart: on-failure
     networks:
@@ -22,7 +29,7 @@ services:
              bin/generate-zookeeper-config.sh conf/zookeeper.conf && \
              exec bin/pulsar zookeeper"
     healthcheck:
-      test: [ "CMD", "bin/pulsar-zookeeper-ruok.sh" ]
+      test: ["CMD", "bin/pulsar-zookeeper-ruok.sh"]
       interval: 10s
       timeout: 5s
       retries: 30
@@ -32,7 +39,7 @@ services:
     container_name: pulsar-init
     hostname: pulsar-init
     image: apachepulsar/pulsar:latest
-    profiles: [ "pulsar" ]
+    profiles: ["pulsar"]
     networks:
       - pulsar
     command: >
@@ -49,7 +56,7 @@ services:
   # Start bookie
   bookie:
     image: apachepulsar/pulsar:latest
-    profiles: [ "pulsar" ]
+    profiles: ["pulsar"]
     container_name: bookie
     restart: on-failure
     networks:
@@ -72,7 +79,7 @@ services:
   # Start broker
   broker:
     image: apachepulsar/pulsar:latest
-    profiles: [ "pulsar" ]
+    profiles: ["pulsar"]
     container_name: broker
     hostname: broker
     restart: on-failure
@@ -97,56 +104,168 @@ services:
       - "8080:8080"
     command: bash -c "bin/apply-config-from-env.py conf/broker.conf
       &&  exec bin/pulsar broker"
-  
-  # Servicios de propiedades_de_los_alpes
-  propiedades_de_los_alpes:
-    container_name: propiedades_de_los_alpes
-    hostname: propiedades_de_los_alpes
-    build: .
-    profiles: [ "propiedades" ]
+
+  # propiedades_de_los_alpes services
+  data_collection:
+    hostname: data_collection
+    build:
+      context: .
+      dockerfile: data_collection.Dockerfile
+    profiles: ["propiedades", "data_collection"]
     networks:
       - pulsar
-      - db
+      - data_collection
+      - bff
     depends_on:
-      postgres:
+      db_data_collection:
         condition: service_healthy
     environment:
-      - propiedades_de_los_alpes_ADDRESS=propiedades_de_los_alpes
+      - data_collection_ADDRESS=data_collection
       - PULSAR_ADDRESS=broker
-      - DATABASE_URL=postgresql+psycopg2://postgres:postgres@postgres:5432/postgres
+      - DATABASE_URL=postgresql+psycopg2://postgres:postgres@db_data_collection:5432/postgres
       - BROKER_HOST=broker
+      - PYTHONUNBUFFERED=1
     ports:
       - "5000:5000"
 
-  postgres:
+  data_control:
+    hostname: data_control
+    build:
+      context: .
+      dockerfile: data_control.Dockerfile
+    profiles: ["propiedades", "data_control"]
+    networks:
+      - pulsar
+      - data_control
+    depends_on:
+      db_data_control:
+        condition: service_healthy
+    environment:
+      - PULSAR_ADDRESS=broker
+      - DATABASE_URL=postgresql+psycopg2://postgres:postgres@db_data_control:5432/postgres
+      - BROKER_HOST=broker
+      - PYTHONUNBUFFERED=1
+
+  properties_and_transactions:
+    build:
+      context: .
+      dockerfile: properties_and_transactions.Dockerfile
+    deploy:
+      replicas: 4
+    profiles: ["propiedades", "properties_and_transactions"]
+    networks:
+      - pulsar
+      - properties_and_transactions
+    depends_on:
+      db_properties_and_transactions:
+        condition: service_healthy
+    environment:
+      - PULSAR_ADDRESS=broker
+      - DATABASE_URL=postgresql+psycopg2://postgres:postgres@db_properties_and_transactions:5432/postgres
+      - BROKER_HOST=broker
+      - PYTHONUNBUFFERED=1
+#    ports:
+#      - "5001:5000" # Commented since we expose the port in the load balancer
+
+  db_data_collection:
     image: postgres:latest
-    container_name: postgres_propiedades_de_los_alpes
-    profiles: [ "propiedades" ]
-    hostname: postgres
+    profiles: ["propiedades", "db"]
     restart: on-failure
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_DB=postgres
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 2s
       timeout: 5s
       retries: 5
     ports:
       - "5433:5432"
     networks:
-      - db
+      - data_collection
 
-  # Watcher para escuchar los eventos de integración generados por data_collection
+  db_data_control:
+    image: postgres:latest
+    profiles: ["propiedades", "db"]
+    restart: on-failure
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=postgres
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 2s
+      timeout: 5s
+      retries: 5
+    ports:
+      - "5434:5432"
+    networks:
+      - data_control
+
+  db_properties_and_transactions:
+    image: postgres:latest
+    profiles: ["propiedades", "db"]
+    restart: on-failure
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=postgres
+    healthcheck:
+        test: ["CMD-SHELL", "pg_isready -U postgres"]
+        interval: 2s
+        timeout: 5s
+        retries: 5
+    ports:
+        - "5435:5432"
+    networks:
+        - properties_and_transactions
+
+  # Watcher to listen for Integration events, This is only for debugging purposes
   watcher:
-    container_name: watcher
     hostname: watcher
     build:
       context: .
       dockerfile: watcher.Dockerfile
-    profiles: [ "watcher" ]
+    deploy:
+      replicas: 4
+    profiles: ["watcher"]
     networks:
       - pulsar
     environment:
       - PULSAR_ADDRESS=broker
+      - PYTHONUNBUFFERED=1
+
+    # Load balancer
+    # TODO: Flask uses redirects on non trailing slashes, so we need to add a trailing slash to the URL
+    # In the meantime you can call the url with the trailing slash explicitly
+  load_balancer:
+    build:
+        context: .
+        dockerfile: load_balancer.Dockerfile
+    restart: on-failure
+    profiles: ["propiedades", "properties_and_transactions"]
+    networks:
+      - properties_and_transactions
+    ports:
+      - "5001:80"
+    depends_on:
+      - properties_and_transactions
+
+  bff_ws:
+    build:
+      context: .
+      dockerfile: bff_ws.Dockerfile
+    restart: on-failure
+    profiles: ["bff"]
+    networks:
+      - bff
+      - pulsar
+    ports:
+      - "8000:8000"
+    depends_on:
+      - data_collection
+    environment:
+      - DATA_INGESTION_URL=http://data_collection:5000
+      - BROKER_HOST=broker
+      - PYTHONUNBUFFERED=1
