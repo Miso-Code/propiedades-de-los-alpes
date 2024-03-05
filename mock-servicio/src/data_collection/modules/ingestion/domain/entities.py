@@ -9,6 +9,7 @@ from .events import PropertyIngestionStartedEvent
 
 @dataclass
 class PropertyIngestion(RootAggregate):
+    agent_id: str = field(default_factory=str)
     status: PropertyIngestionStatus = field(default=PropertyIngestionStatus.PENDING)
     location: Location = field(default_factory=str)
     property_type: str = field(default_factory=str)
@@ -27,7 +28,8 @@ class PropertyIngestion(RootAggregate):
 
     def create_property_ingestion(self):
         self.add_event(PropertyIngestionStartedEvent(
-            id_property_ingestion=str(self.id),
+            property_ingestion_id=str(self.id),
+            agent_id=self.agent_id,
             status=PropertyIngestionStatus.IN_PROGRESS,
             started_at=datetime.now().isoformat()
         ))

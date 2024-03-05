@@ -1,7 +1,6 @@
 from dataclasses import dataclass
 from abc import ABC, abstractmethod
 from typing import Optional
-from uuid import UUID
 
 
 @dataclass(frozen=True)

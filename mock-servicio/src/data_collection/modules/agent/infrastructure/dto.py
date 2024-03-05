@@ -21,3 +21,4 @@ class AgentDTO(db.Model):
     automation_frequency_unit = db.Column(db.String, nullable=True)
     automation_frequency_value = db.Column(db.Integer, nullable=True)
     automation_last_run = db.Column(db.DateTime, nullable=True)
+    started_executions = db.Column(db.Integer, nullable=True, default=0)

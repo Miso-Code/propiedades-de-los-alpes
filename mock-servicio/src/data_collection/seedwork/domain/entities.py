@@ -23,10 +23,10 @@ class Entity:
         return self._id
 
     @id.setter
-    def id(self, id: uuid.UUID) -> None:
+    def id(self, input_id: uuid.UUID) -> None:
         if not ImmutableEntityId(self).is_valid():
             raise ImmutableIdException()
-        self._id = self.next_id()
+        self._id = input_id if isinstance(input_id, uuid.UUID) else self.next_id()
 
 
 @dataclass

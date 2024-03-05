@@ -8,6 +8,7 @@ from datetime import datetime
 
 @dataclass
 class PropertyIngestionStartedEvent(DomainEvent):
-    id_property_ingestion: str = None
+    property_ingestion_id: str = None
+    agent_id: str = None
     status: str = None
     started_at: str = None

@@ -16,4 +16,6 @@ class AutomationAgentDTO(DTO):
     automation_password: str
     automation_frequency_unit: str
     automation_frequency_value: int
+    started_executions: int = 0
     automation_last_run: Optional[datetime] = None
+    id: Optional[str] = None

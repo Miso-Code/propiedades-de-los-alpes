@@ -1,3 +1,5 @@
+from uuid import UUID
+
 from ..application.dto import AutomationAgentDTO
 from ..domain.entities import AutomationAgent
 from ..domain.value_objects import Name, Automation, Authentication, ExecutionFrequency
@@ -9,7 +11,8 @@ class AutomationAgentDTOJsonMapper(AppMapper):
 
     def dto_to_external(self, dto: AutomationAgentDTO) -> dict:
         return dict(
-            creator_name=dict(
+            id=dto.id
+            , creator_name=dict(
                 first_name=dto.creator_name_first_name
                 , last_name=dto.creator_name_last_name
             )
@@ -24,13 +27,16 @@ class AutomationAgentDTOJsonMapper(AppMapper):
                 , frequency=dict(
                     unit=dto.automation_frequency_unit
                     , value=dto.automation_frequency_value
-                )
+                ),
+                last_execution=dto.automation_last_run.isoformat() if dto.automation_last_run else None
             )
+            , started_executions=dto.started_executions
         )
 
     def external_to_dto(self, external: dict) -> AutomationAgentDTO:
         automation_agent_dto = AutomationAgentDTO(
-            creator_name_first_name=external['creator_name']['first_name']
+            id=external.get('id', None)
+            , creator_name_first_name=external['creator_name']['first_name']
             , creator_name_last_name=external['creator_name']['last_name']
             , automation_source=external['automation']['source']
             , automation_protocol=external['automation']['protocol']
@@ -39,6 +45,8 @@ class AutomationAgentDTOJsonMapper(AppMapper):
             , automation_password=external['automation']['auth']['password']
             , automation_frequency_unit=external['automation']['frequency']['unit']
             , automation_frequency_value=external['automation']['frequency']['value']
+            , automation_last_run=external['automation'].get('last_execution')
+            , started_executions=external.get('started_executions', 0)
         )
         return automation_agent_dto
 
@@ -50,7 +58,8 @@ class AutomationAgentMapper(RepoMapper):
 
     def entity_to_dto(self, entity: AutomationAgent) -> AutomationAgentDTO:
         automation_agent_dto = AutomationAgentDTO(
-            creator_name_first_name=entity.creator_name.name
+            id=str(entity.id)
+            , creator_name_first_name=entity.creator_name.name
             , creator_name_last_name=entity.creator_name.last_name
             , automation_source=entity.automation.source
             , automation_protocol=entity.automation.protocol
@@ -60,12 +69,14 @@ class AutomationAgentMapper(RepoMapper):
             , automation_frequency_unit=entity.automation.frequency.unit
             , automation_frequency_value=entity.automation.frequency.value
             , automation_last_run=entity.automation.last_execution
+            , started_executions=entity.started_executions
         )
         return automation_agent_dto
 
     def dto_to_entity(self, dto: AutomationAgentDTO) -> AutomationAgent:
         automation_agent = AutomationAgent(
-            creator_name=Name(
+            id=UUID(dto.id) if dto.id else None
+            , creator_name=Name(
                 name=dto.creator_name_first_name
                 , last_name=dto.creator_name_last_name
             )
@@ -83,5 +94,6 @@ class AutomationAgentMapper(RepoMapper):
                 )
                 , last_execution=dto.automation_last_run
             )
+            , started_executions=dto.started_executions
         )
         return automation_agent

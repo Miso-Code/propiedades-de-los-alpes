@@ -5,9 +5,7 @@ from ..dto import PropertyIngestionDTO
 from ..mappers import PropertyIngestionMapper
 from ...domain.entities import PropertyIngestion
 from ...domain.repositories import PropertyIngestionRepository
-from ...infrastructure.schema.v1.commands import CreatePropertyIngestionPayload
 from ......data_collection.seedwork.application.commands import Command
-from ...domain.value_objects import Location
 from .....seedwork.application.commands import execute_command as command
 from .....seedwork.infrastructure.uow import UnitOfWorkPort
 
@@ -15,7 +13,17 @@ from .....seedwork.infrastructure.uow import UnitOfWorkPort
 @dataclass
 class CreatePropertyIngestionCommand(Command):
     agent_id: str
-    location: Location
+    location_city_name: str
+    location_city_code: str
+    location_country_name: str
+    location_country_code: str
+    location_address: str
+    location_building: str
+    location_floor: str
+    location_inner_code: str
+    location_coordinates_latitude: float
+    location_coordinates_longitude: float
+    location_additional_info: str
     property_type: str
     property_subtype: str
     rooms: int
@@ -28,32 +36,25 @@ class CreatePropertyIngestionCommand(Command):
     price_per_m2: float
     price_per_ft2: float
     property_url: str
-    property_images: list
-
-    def __init__(self, property_ingestion_data: CreatePropertyIngestionPayload | PropertyIngestionDTO):
-        self.agent_id = property_ingestion_data.agent_id
-        self.location = property_ingestion_data.location
-        self.property_type = property_ingestion_data.property_type
-        self.property_subtype = property_ingestion_data.property_subtype
-        self.rooms = property_ingestion_data.rooms
-        self.bathrooms = property_ingestion_data.bathrooms
-        self.parking_spaces = property_ingestion_data.parking_spaces
-        self.construction_area = property_ingestion_data.construction_area
-        self.land_area = property_ingestion_data.land_area
-        self.price = property_ingestion_data.price
-        self.currency = property_ingestion_data.currency
-        self.price_per_m2 = property_ingestion_data.price_per_m2
-        self.price_per_ft2 = property_ingestion_data.price_per_ft2
-        self.property_url = property_ingestion_data.property_url
-        self.property_images = property_ingestion_data.property_images
+    property_images: str
 
 
 class CreateIngestionHandler(CreateIngestionBaseHandler):
-
     def handle(self, command: CreatePropertyIngestionCommand):
+        # TODO: UPDATE INGESTION STATUS!!!!!!!!! :sparkles:
         property_ingestion_dto = PropertyIngestionDTO(
             agent_id=command.agent_id
-            , location=command.location
+            , location_city_name=command.location_city_name
+            , location_city_code=command.location_city_code
+            , location_country_name=command.location_country_name
+            , location_country_code=command.location_country_code
+            , location_address=command.location_address
+            , location_building=command.location_building
+            , location_floor=command.location_floor
+            , location_inner_code=command.location_inner_code
+            , location_coordinates_latitude=command.location_coordinates_latitude
+            , location_coordinates_longitude=command.location_coordinates_longitude
+            , location_additional_info=command.location_additional_info
             , property_type=command.property_type
             , property_subtype=command.property_subtype
             , rooms=command.rooms
