@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from colorama import Fore, Style
 
+from src.data_control.seedwork.domain.exceptions import DomainException
 from .base import CreatePropertiesBaseHandler
 from .....seedwork.application.commands import Command
 from .....seedwork.application.commands import execute_command as command

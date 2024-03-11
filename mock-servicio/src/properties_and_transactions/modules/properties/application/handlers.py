@@ -7,6 +7,11 @@ from ..infrastructure.dispatchers import Dispatcher
 class HandlerPropertyDomain(Handler):
 
     @staticmethod
-    def handle_property_ingestion_started(event: PropertyCreatedEvent):
+    def handle_property_created(event: PropertyCreatedEvent):
         dispatcher = Dispatcher()
         dispatcher.publish_created_event(event.__dict__, 'property-events')
+
+    @staticmethod
+    def handle_property_not_created(event: PropertyCreatedEvent):
+        dispatcher = Dispatcher()
+        dispatcher.publish_not_created_event(event.__dict__, 'property-failed-events')
