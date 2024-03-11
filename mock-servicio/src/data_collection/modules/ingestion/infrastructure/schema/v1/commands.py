@@ -33,3 +33,11 @@ class CreatePropertyIngestionPayload(IntegrationCommand):
 
 class CreatePropertyIngestionCommand(IntegrationCommand):
     data = CreatePropertyIngestionPayload()
+
+
+class DeletePropertyIngestionPayload(IntegrationCommand):
+    property_ingestion_id = String()
+
+
+class DeletePropertyIngestionCommand(IntegrationCommand):
+    data = DeletePropertyIngestionPayload()

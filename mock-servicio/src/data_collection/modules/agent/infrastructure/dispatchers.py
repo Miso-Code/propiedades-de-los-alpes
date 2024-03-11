@@ -7,6 +7,7 @@ import datetime
 from ...ingestion.infrastructure.schema.v1.commands import CreatePropertyIngestionCommand, \
     CreatePropertyIngestionPayload
 from ....seedwork.infrastructure import utils
+from ....seedwork.infrastructure.utils import get_topic_name, pulsar_auth
 
 epoch = datetime.datetime.utcfromtimestamp(0)
 
@@ -17,8 +18,8 @@ def unix_time_millis(dt):
 
 class Dispatcher:
     def _publish_message(self, message, topic, schema):
-        client = pulsar.Client(f'pulsar://{utils.broker_host()}:6650')
-        producer = client.create_producer(topic, schema=schema)
+        client = pulsar.Client(utils.broker_host(), authentication=pulsar_auth())
+        producer = client.create_producer(get_topic_name(topic), schema=schema)
         producer.send(message)
         client.close()
 

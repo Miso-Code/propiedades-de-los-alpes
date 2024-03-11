@@ -46,6 +46,7 @@ class PropertyIngestionDTOJsonMapper(AppMapper):
             , 'price_per_ft2': dto.price_per_ft2
             , 'property_url': dto.property_url
             , 'property_images': dto.property_images
+            , 'status': dto.status
         }
 
     def external_to_dto(self, external: dict) -> PropertyIngestionDTO:

@@ -2,17 +2,17 @@ import pulsar
 from pulsar.schema import *
 from colorama import Fore, Back, Style
 
-import datetime
-
+from .schema.v1.commands import CreatePropertyIngestionCommand, CreatePropertyIngestionPayload, \
+    DeletePropertyIngestionPayload, DeletePropertyIngestionCommand
 from .schema.v1.events import PropertyIngestionCreatedEvent
-from .schema.v1.commands import CreatePropertyIngestionCommand, CreatePropertyIngestionPayload
 from ....seedwork.infrastructure import utils
+from ....seedwork.infrastructure.utils import get_topic_name, pulsar_auth
 
 
 class Dispatcher:
     def _publish_message(self, message, topic, schema):
-        client = pulsar.Client(f'pulsar://{utils.broker_host()}:6650')
-        producer = client.create_producer(topic, schema=schema)
+        client = pulsar.Client(utils.broker_host(), authentication=pulsar_auth())
+        producer = client.create_producer(get_topic_name(topic), schema=schema)
         producer.send(message)
         client.close()
 
@@ -22,7 +22,7 @@ class Dispatcher:
         print(Style.RESET_ALL)
         self._publish_message(integration_event, topic, AvroSchema(PropertyIngestionCreatedEvent))
 
-    def publish_command(self, command, topic: str):
+    def publish_create_command(self, command, topic: str):
         payload = CreatePropertyIngestionPayload(
             agent_id=str(command.agent_id),
             location_city_name=str(command.location_city_name),
@@ -55,3 +55,13 @@ class Dispatcher:
         print(Fore.GREEN + "[Ingestion] Integration Command published: ", integration_command)
         print(Style.RESET_ALL)
         self._publish_message(integration_command, topic, AvroSchema(CreatePropertyIngestionCommand))
+
+    def publish_delete_command(self, command, topic: str):
+        payload = DeletePropertyIngestionPayload(
+            property_ingestion_id=str(command.id)
+        )
+
+        integration_command = DeletePropertyIngestionCommand(data=payload)
+        print(Fore.GREEN + "[Ingestion] Integration Command published: ", integration_command)
+        print(Style.RESET_ALL)
+        self._publish_message(integration_command, topic, AvroSchema(DeletePropertyIngestionCommand))
