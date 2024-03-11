@@ -19,8 +19,8 @@ async def subscribe_to_topic(topic: str, subscription: str, schema: str,
         # json_schema = consultar_schema_registry(schema)
         # avro_schema = obtener_schema_avro_de_diccionario(json_schema)
         avro_schema = AvroSchema(PropertyCreatedEvent)
-        async with aiopulsar.connect(f'pulsar://{broker_host()}:6650') as cliente:
-            async with cliente.subscribe(
+        async with aiopulsar.connect(broker_host()) as client:
+            async with client.subscribe(
                     topic,
                     consumer_type=consumer_type,
                     subscription_name=subscription,
