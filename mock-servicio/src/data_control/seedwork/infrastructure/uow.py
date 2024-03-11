@@ -55,6 +55,7 @@ class UnitOfWork(ABC):
 
     @abstractmethod
     def rollback(self, savepoint=None):
+        self._publish_post_rollback_events()
         self._clear_batches()
 
     @abstractmethod
@@ -73,6 +74,10 @@ class UnitOfWork(ABC):
     def _publish_post_commit_events(self):
         for event in self._get_events():
             dispatcher.send(signal=f'{type(event).__name__}Integration', event=event)
+
+    def _publish_post_rollback_events(self):
+        for event in self._get_events():
+            dispatcher.send(signal=f'{type(event).__name__}Rollback', event=event)
 
 
 session = {}
