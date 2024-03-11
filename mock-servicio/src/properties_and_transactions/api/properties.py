@@ -1,4 +1,6 @@
 import json
+import sys
+
 from flask import request, Response
 
 from ..modules.properties.application.queries.get_all_properties import GetAllProperties
@@ -13,6 +15,7 @@ from ..seedwork.presentation.api import create_blueprint
 bp = create_blueprint('properties_and_transactions', '/properties_and_transactions')
 dispatcher = Dispatcher()
 
+
 @bp.route('/', methods=('GET',))
 @bp.route('/<id>', methods=('GET',))
 def get_all_properties(id=None):
@@ -26,16 +29,16 @@ def get_all_properties(id=None):
 
     except DomainException as e:
         return Response(json.dumps(dict(error=str(e))), status=400, mimetype='application/json')
-    
+
 
 @bp.route('/', methods=('POST',))
 def post_properties():
     try:
         property_dict = request.json
-        
+
         mapper = PropertyDTOJsonMapper()
         property_properties_dto = mapper.external_to_dto(property_dict)
-        
+
         command = RegisterPropertiesCommand(
             agent_id=property_properties_dto.agent_id
             , property_id=property_properties_dto.property_id
@@ -51,8 +54,13 @@ def post_properties():
             , property_type=property_properties_dto.property_type
         )
         dispatcher.publish_validated_event(command.__dict__, "property-transactions-event")
-        
+
         return Response("{}", status=202, mimetype='application/json')
-        
+
     except DomainException as e:
         return Response(json.dumps(dict(error=str(e))), status=400, mimetype='application/json')
+
+
+@bp.route('/degrade', methods=('POST',))
+def degrade():
+    sys.exit("Degrading the service D;")
