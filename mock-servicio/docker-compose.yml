@@ -8,6 +8,8 @@ networks:
     driver: bridge
   properties_and_transactions:
     driver: bridge
+  watchdog:
+    driver: bridge
   bff:
     driver: bridge
 name: propiedades_de_los_alpes
@@ -121,9 +123,11 @@ services:
         condition: service_healthy
     environment:
       - data_collection_ADDRESS=data_collection
-      - PULSAR_ADDRESS=broker
+      - PULSAR_SCHEMA=pulsar
+      - PULSAR_HOST=broker
+      - PULSAR_PORT=6650
+      - PULSAR_API_KEY=""
       - DATABASE_URL=postgresql+psycopg2://postgres:postgres@db_data_collection:5432/postgres
-      - BROKER_HOST=broker
       - PYTHONUNBUFFERED=1
     ports:
       - "5000:5000"
@@ -141,9 +145,11 @@ services:
       db_data_control:
         condition: service_healthy
     environment:
-      - PULSAR_ADDRESS=broker
+      - PULSAR_SCHEMA=pulsar
+      - PULSAR_HOST=broker
+      - PULSAR_PORT=6650
+      - PULSAR_API_KEY=""
       - DATABASE_URL=postgresql+psycopg2://postgres:postgres@db_data_control:5432/postgres
-      - BROKER_HOST=broker
       - PYTHONUNBUFFERED=1
 
   properties_and_transactions:
@@ -160,12 +166,34 @@ services:
       db_properties_and_transactions:
         condition: service_healthy
     environment:
-      - PULSAR_ADDRESS=broker
       - DATABASE_URL=postgresql+psycopg2://postgres:postgres@db_properties_and_transactions:5432/postgres
-      - BROKER_HOST=broker
+      - PULSAR_SCHEMA=pulsar
+      - PULSAR_HOST=broker
+      - PULSAR_PORT=6650
+      - PULSAR_API_KEY=""
       - PYTHONUNBUFFERED=1
 #    ports:
 #      - "5001:5000" # Commented since we expose the port in the load balancer
+
+  watchdog:
+    hostname: watchdog
+    build:
+      context: .
+      dockerfile: watchdog.Dockerfile
+    profiles: ["watchdog"]
+    networks:
+      - pulsar
+      - watchdog
+    depends_on:
+      db_watchdog:
+        condition: service_healthy
+    environment:
+      - PULSAR_SCHEMA=pulsar
+      - PULSAR_HOST=broker
+      - PULSAR_PORT=6650
+      - PULSAR_API_KEY=""
+      - DATABASE_URL=postgresql+psycopg2://postgres:postgres@db_watchdog:5432/postgres
+      - PYTHONUNBUFFERED=1
 
   db_data_collection:
     image: postgres:latest
@@ -221,6 +249,24 @@ services:
     networks:
         - properties_and_transactions
 
+  db_watchdog:
+    image: postgres:latest
+    profiles: [ "db", "watchdog"]
+    restart: on-failure
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=postgres
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 2s
+      timeout: 5s
+      retries: 5
+    ports:
+      - "5436:5432"
+    networks:
+      - watchdog
+
   # Watcher to listen for Integration events, This is only for debugging purposes
   watcher:
     hostname: watcher
@@ -233,7 +279,10 @@ services:
     networks:
       - pulsar
     environment:
-      - PULSAR_ADDRESS=broker
+      - PULSAR_SCHEMA=pulsar
+      - PULSAR_HOST=broker
+      - PULSAR_PORT=6650
+      - PULSAR_API_KEY=""
       - PYTHONUNBUFFERED=1
 
     # Load balancer
@@ -252,20 +301,42 @@ services:
     depends_on:
       - properties_and_transactions
 
-  bff_ws:
+#  bff_ws:
+#    build:
+#      context: .
+#      dockerfile: bff_ws.Dockerfile
+#    restart: on-failure
+#    # profiles: ["bff"]
+#    networks:
+#      - bff
+#      - pulsar
+#    ports:
+#      - "8000:8000"
+#    depends_on:
+#      - data_collection
+#    environment:
+#      - DATA_INGESTION_URL=http://data_collection:5000
+#      - PYTHONUNBUFFERED=1
+
+  bff_gql:
     build:
       context: .
-      dockerfile: bff_ws.Dockerfile
+      dockerfile: bff_gql.Dockerfile
     restart: on-failure
     profiles: ["bff"]
     networks:
       - bff
       - pulsar
     ports:
-      - "8000:8000"
+      - "8001:8000"
     depends_on:
       - data_collection
     environment:
-      - DATA_INGESTION_URL=http://data_collection:5000
-      - BROKER_HOST=broker
+      - DATA_COLLECTION_PATH=http://data_collection:5000
+      - DATA_CONTROL_PATH=http://data_control:5000
+      - PROPERTY_AND_TRANSACTIONS_PATH=http://properties_and_transactions:5000
+      - PULSAR_SCHEMA=pulsar
+      - PULSAR_HOST=broker
+      - PULSAR_PORT=6650
+      - PULSAR_API_KEY=""
       - PYTHONUNBUFFERED=1
