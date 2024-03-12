@@ -241,3 +241,25 @@ Message:
 | Incrementar el nivel de abstracción | Alcanzar un nivel de abstracción suficiente que suplas condiciones de agregar un nuevo país con sus diferentes normas en la información requerida                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    | Sobrecarga cognitiva en el modelo abstracto | Contar con un modelo demasiado abstracto que sea difícil de mantener y/o que no pueda suplir el 100% de los escenarios de los nuevos mercados. |
 | Justificación                       | Gracias a la arquitectura hexagonal, logramos aislar el dominio de la aplicación y la infraestructura del sistema PDA. De igual manera, la implementación del patrón de inversión de dependencias, hemos logrado organizar nuestros modelos en tres capas distintas. Esta estructura garantiza que cada capa esté aislada y se comunique con las demás a través de puertos y adaptadores. Además, esta división nos ha facilitado la incorporación de un módulo de Normas Países en el paquete de Control de datos. Esto simplifica significativamente la tarea de ingresar a nuevos mercados, reduciendo la complejidad del proceso |
 
+## Entrega 5
+
+### Trabajo Realizado para entrega 5
+
+- Creación de bff en GraphQL (a cargo de @ocralo)
+- Creación del servicio `watchdog` que se encarga de las Sagas (trabajo conjunto de todo el equipo)
+- Actualización de los servicios de:
+  - Data Collection (a cargo de @erikloaiza)
+  - Data Control (a cargo de @pipeCer)
+  - Properties and Transactions (a cargo de @brayanhenao)
+  para soportar Sagas (Acciones y compensaciones).
+- Despliegue en GCP (Google Cloud Platform) de los servicios antes mencionados haciendo uso de CloudRun, CloudSQL y
+  Stream Native (Apache Pulsar as a Service) (a cargo de @pipeCer y @brayanhenao)
+- Ejecución de las pruebas para validar los escenarios planteados en la entrega 3 (Se usó JMetter para las pruebas de
+  carga) (a cargo de @ocralo y @erikloaiza)
+
+
+### Colección de postman con endpoints de GraphQL
+
+Colección con los endpoints de GraphQL que se utilizaron en las pruebas:
+
+[`./docs/entrega_5.postman_collection.json`](./docs/entrega_5.postman_collection.json).

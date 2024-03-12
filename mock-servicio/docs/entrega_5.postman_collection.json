@@ -1,0 +1,182 @@
+{
+	"info": {
+		"_postman_id": "c9264b0c-4a39-4fed-a39a-810d96d7dcac",
+		"name": "No monoliticas",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "32645870"
+	},
+	"item": [
+		{
+			"name": "Property ingestion",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"agent_id\": \"4b108585-0c0c-4c40-b0f8-93f98b2e89b3\",\n  \"location\": {\n    \"city\":{\n        \"name\": \"New York\",\n        \"code\": \"NY\",\n        \"country\": {\n            \"name\":\"United States Of America\",\n            \"code\": \"US\"\n        }\n    },\n    \"address\":\"Fake st 123\",\n    \"building\": \"Empire State\",\n    \"floor\": 4000,\n    \"inner_code\": \"To the left\",\n    \"coordinates\":{\n        \"latitude\":\"44551232\",\n        \"longitude\": \"213123123\"\n    },\n    \"additional_info\":\"\"\n  },\n  \"property_type\": \"Your property type\",\n  \"property_subtype\": \"Your property subtype\",\n  \"rooms\": 10, \n  \"bathrooms\": 0, \n  \"parking_spaces\": 0, \n  \"construction_area\": 0, \n  \"land_area\": 0, \n  \"price\": 0, \n  \"currency\": \"Currency type (e.g., USD, EUR)\",\n  \"price_per_m2\": 0, \n  \"price_per_ft2\": 0, \n  \"property_url\": \"URL to the property listing\",\n  \"property_images\": \"URL to image 1\" \n}\n"
+				},
+				"url": {
+					"raw": "http://localhost:5000/ingestion/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"ingestion",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Automate agent",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Cookie",
+						"value": "session=eyJ1b3ciOnsiIGIiOiJnQVNWVHdBQUFBQUFBQUNNSG5OeVl5NWtZWFJoWDJOdmJHeGxZM1JwYjI0dVkyOXVabWxuTG5WdmQ1U01GRk5SVEVGc1kyaGxiWGxWYm1sMFQyWlhiM0pybEpPVUtZR1VmWlNNQ0Y5aVlYUmphR1Z6bEYyVWMySXUifX0.Zd0c2g.O2L7mFmpMy-4reYjMe3GtQbZcx8"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"creator_name\":{\n        \"first_name\": \"Miso\",\n        \"last_name\": \"Team\"\n    },\n    \"automation\":{\n        \"source\": \"URL\",\n        \"protocol\": \"HTTP\",\n        \"port\": \"80\",\n        \"auth\":{\n            \"username\":\"foo\",\n            \"password\":\"bar\"\n        },\n        \"frequency\":{\n            \"unit\": \"seconds\",\n            \"value\": 10\n        }\n    }\n}"
+				},
+				"url": {
+					"raw": "http://localhost:5000/agent/automation",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"agent",
+						"automation"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "BFF - property ingestion mutations",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "graphql",
+					"graphql": {
+						"query": "mutation CreatePropertyIngestion {\n  createPropertyIngestion(data: {\n    agentId: \"4b108585-0c0c-4c40-b0f8-93f98b2e89b3\",\n    location: {\n      city: {\n        name: \"New York\",\n        code: \"NY\",\n        country: {\n          name: \"United States Of America\",\n          code: \"US\"\n        }\n      },\n      address: \"Fake st 123\",\n      building: \"Empire State\",\n      floor: \"4000\",\n      innerCode: \"To the left\",\n      coordinates: {\n        latitude: 4.4551232,\n        longitude: 74.213123123\n      },\n      additionalInfo: \"\"\n    },\n    propertyType: \"Your property type\",\n    propertySubtype: \"Your property subtype\",\n    rooms: 10, \n    bathrooms: 0, \n    parkingSpaces: 0, \n    constructionArea: 0, \n    landArea: 0, \n    price: 0, \n    currency: \"Currency type (e.g., USD, EUR)\",\n    pricePerM2: 0, \n    pricePerFt2: 0, \n    propertyUrl: \"URL to the property listing\",\n    propertyImages: \"URL to image 1\" \n  }) {\n    message\n    code\n  }\n}\n",
+						"variables": ""
+					}
+				},
+				"url": {
+					"raw": "http://0.0.0.0:8000/v1",
+					"protocol": "http",
+					"host": [
+						"0",
+						"0",
+						"0",
+						"0"
+					],
+					"port": "8000",
+					"path": [
+						"v1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "BFF - property ingestion queries",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "graphql",
+					"graphql": {
+						"query": "{\n  propertiesIngestion {\n    agentId,\n    status,\n    location {\n      city {\n        name,\n        code,\n        country {\n          name,\n          code\n        }\n      },\n      address,\n      building,\n      floor,\n      innerCode,\n      coordinates {\n        longitude,\n        latitude\n      },\n      additionalInfo\n    },\n    propertyType,\n    propertySubtype,\n    rooms,\n    bathrooms,,\n    parkingSpaces,\n    constructionArea,\n    landArea,\n    price,\n    currency,\n    pricePerM2,\n    pricePerFt2,\n    propertyUrl,\n    propertyImages\n    \n  }\n}",
+						"variables": ""
+					}
+				},
+				"url": {
+					"raw": "http://0.0.0.0:8000/v1",
+					"protocol": "http",
+					"host": [
+						"0",
+						"0",
+						"0",
+						"0"
+					],
+					"port": "8000",
+					"path": [
+						"v1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "BFF - property query",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "graphql",
+					"graphql": {
+						"query": "{\n  properties {\n    id,\n    agentId,\n    propertyId,\n    propertyAddress,\n    propertyCity,\n    propertyState,\n    propertyZip,\n    propertyPrice,\n    propertyBedrooms,\n    propertyBathrooms,\n    propertySquareFeet,\n    propertyLotSize,\n    propertyType\n  }\n}",
+						"variables": ""
+					}
+				},
+				"url": {
+					"raw": "http://0.0.0.0:8000/v1",
+					"protocol": "http",
+					"host": [
+						"0",
+						"0",
+						"0",
+						"0"
+					],
+					"port": "8000",
+					"path": [
+						"v1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "BFF - subscription",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://0.0.0.0:8000/events/stream",
+					"protocol": "http",
+					"host": [
+						"0",
+						"0",
+						"0",
+						"0"
+					],
+					"port": "8000",
+					"path": [
+						"events",
+						"stream"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
