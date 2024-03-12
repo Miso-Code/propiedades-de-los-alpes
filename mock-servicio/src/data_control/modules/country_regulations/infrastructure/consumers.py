@@ -3,23 +3,28 @@ import traceback
 
 import _pulsar
 import pulsar
+from colorama import Fore, Style
 from pulsar.schema import *
 
-from colorama import Fore, Style
-
+from .schema.v1.commands import DisapprovePropertyIngestionCommand as DisapprovePropertyIngestionCommandSchema
 from .schema.v1.events import PropertyIngestionCreatedEvent as PropertyIngestionCreatedEventSchema
 from ..application.commands.apply_regulation_property_ingestion import ApplyCountryRegulationToPropertyIngestionCommand
+from ..application.commands.unapply_regulation_property_ingestion import \
+    UnApplyCountryRegulationToPropertyIngestionCommand
 from ....seedwork.application.commands import execute_command
 from ....seedwork.infrastructure import utils
+from ....seedwork.infrastructure.utils import get_topic_name, pulsar_auth
 
 
 def subscribe_to_events(app=None):
     client = None
     try:
-        client = pulsar.Client(f'pulsar://{utils.broker_host()}:6650')
-        consumer = client.subscribe('property-ingestion-events', consumer_type=_pulsar.ConsumerType.Shared,
-                                    subscription_name='propiedades-de-los-alpes-sub-events',
-                                       schema=AvroSchema(PropertyIngestionCreatedEventSchema))
+        client = pulsar.Client(utils.broker_host(), authentication=pulsar_auth())
+        consumer = client.subscribe(get_topic_name('property-ingestion-events'),
+                                    consumer_type=_pulsar.ConsumerType.Shared,
+                                    subscription_name='data-control-sub-events',
+                                    schema=AvroSchema(PropertyIngestionCreatedEventSchema),
+                                    initial_position=pulsar.InitialPosition.Earliest)
 
         while True:
             message = consumer.receive()
@@ -61,6 +66,36 @@ def subscribe_to_events(app=None):
         client.close()
     except:
         logging.error('ERROR: Suscribiendose al tópico de eventos!')
+        traceback.print_exc()
+        if client:
+            client.close()
+
+
+def subscribe_to_commands():
+    client = None
+    try:
+        client = pulsar.Client(utils.broker_host(), authentication=pulsar_auth())
+        consumer = client.subscribe(get_topic_name('data-control-commands'),
+                                    consumer_type=_pulsar.ConsumerType.Shared,
+                                    subscription_name='data-control-sub-commands',
+                                    schema=AvroSchema(DisapprovePropertyIngestionCommandSchema))
+
+        while True:
+            message = consumer.receive()
+            print(Fore.GREEN + '[Ingestion] Integration Command received: ', message.value().data)
+            print(Style.RESET_ALL)
+
+            data = message.value().data
+            command = UnApplyCountryRegulationToPropertyIngestionCommand(
+                property_ingestion_id=data.property_ingestion_id
+            )
+
+            execute_command(command)
+            consumer.acknowledge(message)
+
+        client.close()
+    except Exception:
+        logging.error('[Ingestion] ERROR: Subscribing to commands topic!')
         traceback.print_exc()
         if client:
             client.close()

@@ -8,7 +8,7 @@ class PropertyDTO(db.Model):
     id = db.Column(db.String, primary_key=True)
     agent_id = db.Column(db.String)
     property_id = db.Column(db.String)
-    property_address = db.Column(db.String)
+    property_address = db.Column(db.String, unique=True)
     property_city = db.Column(db.String)
     property_state = db.Column(db.String)
     property_zip = db.Column(db.String)

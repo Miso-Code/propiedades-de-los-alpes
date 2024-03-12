@@ -3,26 +3,27 @@ import traceback
 
 import _pulsar
 import pulsar
+from colorama import Fore, Style
 from flask import Flask
 from pulsar.schema import *
-
-from colorama import Fore, Style
 
 from .schema.v1.events import PropertyIngestionValidatedEvent
 from ..application.commands.register_property import RegisterPropertiesCommand
 from ....seedwork.application.commands import execute_command
 from ....seedwork.infrastructure import utils
+from ....seedwork.infrastructure.utils import get_topic_name, pulsar_auth
 
 
-def subscribe_to_events(app: Flask =None):
+def subscribe_to_events(app: Flask = None):
     client = None
     try:
-        client = pulsar.Client(f'pulsar://{utils.broker_host()}:6650')
-        consumer = client.subscribe('property-regulation-events', 
+        client = pulsar.Client(utils.broker_host(), authentication=pulsar_auth())
+        consumer = client.subscribe(get_topic_name('property-regulation-events'),
                                     consumer_type=_pulsar.ConsumerType.Shared,
                                     subscription_name='propiedades-de-los-alpes-sub-events',
-                                    schema=AvroSchema(PropertyIngestionValidatedEvent))
-                  
+                                    schema=AvroSchema(PropertyIngestionValidatedEvent),
+                                    initial_position=pulsar.InitialPosition.Earliest)
+
         while True:
             with app.app_context() and app.test_request_context():
                 message = consumer.receive()

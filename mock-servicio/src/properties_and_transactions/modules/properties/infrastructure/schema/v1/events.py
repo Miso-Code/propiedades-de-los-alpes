@@ -49,3 +49,17 @@ class PropertyCreatedEvent(IntegrationEvent):
     property_square_feet = Integer()
     property_lot_size = Integer()
     property_type = String()
+
+class PropertyNotCreatedEvent(IntegrationEvent):
+    agent_id = String()
+    property_id = String()
+    property_address = String()
+    property_city = String()
+    property_state = String()
+    property_zip = String()
+    property_price = Float()
+    property_bedrooms = Integer()
+    property_bathrooms = Integer()
+    property_square_feet = Integer()
+    property_lot_size = Integer()
+    property_type = String()
